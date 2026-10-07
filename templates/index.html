@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PhishGuard | Phishing URL Detector</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            padding: 20px 8%;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .badge {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 80px auto;
+            padding: 0 25px;
+            text-align: center;
+        }
+
+        .container h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .container h1 span {
+            color: #38bdf8;
+        }
+
+        .description {
+            color: #94a3b8;
+            font-size: 18px;
+            margin-bottom: 45px;
+        }
+
+        .scanner {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        input {
+            flex: 1;
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #38bdf8;
+        }
+
+        button {
+            padding: 16px 25px;
+            border: none;
+            border-radius: 10px;
+            background: #0284c7;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0369a1;
+        }
+
+        .result {
+            margin-top: 30px;
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: left;
+        }
+
+        .result h2 {
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            margin-bottom: 12px;
+        }
+
+        .score {
+            font-size: 30px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .phishing {
+            color: #ef4444;
+        }
+
+        .suspicious {
+            color: #f59e0b;
+        }
+
+        .safe {
+            color: #22c55e;
+        }
+
+        .reasons {
+            margin-top: 20px;
+        }
+
+        .reasons h3 {
+            margin-bottom: 12px;
+        }
+
+        .reasons ul {
+            padding-left: 20px;
+        }
+
+        .reasons li {
+            margin-bottom: 8px;
+            color: #cbd5e1;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .info-card {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .info-card h3 {
+            margin-bottom: 8px;
+            color: #38bdf8;
+        }
+
+        .info-card p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        @media (max-width: 700px) {
+
+            .container h1 {
+                font-size: 36px;
+            }
+
+            .input-row {
+                flex-direction: column;
+            }
+
+            .info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            PhishGuard
+        </div>
+
+        <div class="badge">
+            Cybersecurity URL Analysis
+        </div>
+
+    </nav>
+
+
+    <main class="container">
+
+        <h1>
+            Detect <span>Phishing</span> URLs
+        </h1>
+
+        <p class="description">
+            Analyze suspicious URLs and identify common phishing indicators.
+        </p>
+
+
+        <section class="scanner">
+
+            <label for="url">
+                Enter URL to analyze
+            </label>
+
+            <form method="POST">
+
+                <div class="input-row">
+
+                    <input
+                        type="text"
+                        name="url"
+                        placeholder="https://example.com"
+                        required
+                    >
+
+                    <button type="submit">
+                        Analyze URL
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        {% if result %}
+
+        <section class="result">
+
+            <h2>
+                Security Analysis
+            </h2>
+
+            <div class="result-item">
+
+                <strong>URL:</strong>
+
+                {{ result["url"] }}
+
+            </div>
+
+
+            <div class="score">
+
+                Risk Score:
+                {{ result["score"] }}/100
+
+            </div>
+
+
+            <div class="
+                {% if result['verdict'] == 'PHISHING' %}
+                    phishing
+                {% elif result['verdict'] == 'SUSPICIOUS' %}
+                    suspicious
+                {% else %}
+                    safe
+                {% endif %}
+            ">
+
+                <strong>
+                    Verdict: {{ result["verdict"] }}
+                </strong>
+
+            </div>
+
+
+            <div class="reasons">
+
+                <h3>
+                    Detection Reasons
+                </h3>
+
+                {% if result["reasons"] %}
+
+                <ul>
+
+                    {% for reason in result["reasons"] %}
+
+                    <li>
+                        {{ reason }}
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+
+                {% else %}
+
+                <p>
+                    No major suspicious indicators detected.
+                </p>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <section class="info">
+
+            <div class="info-card">
+
+                <h3>
+                    URL Analysis
+                </h3>
+
+                <p>
+                    Examines URL structure and suspicious characteristics.
+                </p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h3>
+                    Risk Scoring
+                </h3>
+
+                <p>
+                    Calculates a risk score based on detected indicators.
+                </p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h3>
+                    Security Report
+                </h3>
+
+                <p>
+                    Explains why a URL may be considered suspicious.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
